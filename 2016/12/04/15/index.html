@@ -1,0 +1,88 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta name="generator" content="Hexo 3.8.0"><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="description"><title>教你破解隔壁妹子的wifi密码，成功率高达90% | imlifengfeng</title><link rel="stylesheet" type="text/css" href="/css/style.css?v=0.0.0"><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/normalize/8.0.1/normalize.min.css"><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/pure/1.0.0/pure-min.css"><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/pure/1.0.0/grids-responsive-min.css"><link rel="stylesheet" href="//lib.baomitu.com/font-awesome/4.7.0/css/font-awesome.min.css"><script type="text/javascript" src="//lib.baomitu.com/jquery/3.3.1/jquery.min.js"></script><link rel="icon" mask="" sizes="any" href="/favicon.ico"><link rel="Shortcut Icon" type="image/x-icon" href="/favicon.ico"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png"><link href="//netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"><link rel="alternate" type="application/atom+xml" href="/atom.xml"></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden">教你破解隔壁妹子的wifi密码，成功率高达90%</h1><a id="logo" href="/.">imlifengfeng</a><p class="description"></p></div><div id="nav-menu"><a class="current" href="/."><i class="fa fa-home"> 首页</i></a><a href="/archives/"><i class="fa fa-archive"> 归档</i></a><a href="/about/"><i class="fa fa-user"> 关于</i></a><a href="/atom.xml"><i class="fa fa-rss"> 订阅</i></a></div></div><div class="pure-g" id="layout"><div class="pure-u-1 pure-u-md-3-4"><div class="content_container"><div class="post"><h1 class="post-title">教你破解隔壁妹子的wifi密码，成功率高达90%</h1><div class="post-meta">Dec 4, 2016<span> | </span><span class="category"><a href="/categories/教程/">教程</a></span></div><div class="post-content"><p>破解wifi密码听起来很复杂，实际上也不是非常的复杂，极客君（微信公众帐号：极客峰）今天教大家如何破解隔壁妹子的wifi密码。</p>
+<p><strong>首先声明：本教程只用于技术交流，请勿用于非法用途。请严格遵循相关法律法规。为了保护本例中被破解密码者信息，本人不透露wifi主人所在地理位置。本人有宽带，也不会使用被破解者的wifi。</strong></p>
+<p>目前无线网络加密形式常见的有两种，WEP和WPA/WPA2，WEP破解方法非常简单，但是现在这种加密方式由于不安全基本上见不到了。这里就没有必要讨论WEP破解方法了。</p>
+<p>今天我们要破解的正是最难破解的WPA/WPA2加密方式的密码！WPA/WPA2破解的主流方法有Pin码破解、抓包破解。</p>
+<p>Pin码破解最简单成功率最高，但是必须要路由器开启wps才行，而且很多最新的路由器都有防pin码破解功能，对于Pin码破解，大家可以用虚拟机安装CDLinux系统，里面集成了相关的软件，网上百度一下就能找到相关的教程。</p>
+<p>今天我们要讲的是抓包破解，如果路由器没有开启wps，Pin码破解的方式就不能用了，对于路由器开启了wps功能创建的wifi来说，抓包破解wifi密码的成功率要低于pin码破解，但是如果有了强大有效密码字典后，抓包破解的成功率将会骤升，就是路由器没有开启wps功能，抓包破解照样能破解wifi密码。</p>
+<p>抓包破解又称暴力破解，就是对密码字典中的密码逐个试，直到找到正确的密码，你可以做个包含所有密码的密码字典（后面会有密码字典生成教程，也会提供高成功率的密码字典包），让机器逐个试，成功率百分之百，但是这种方法不科学，因为所有密码的字典包会非常非常大，里面包含很多不可能出现的密码，浪费时间。</p>
+<p>本教程中使用的电脑为Mac，如果使用其他电脑也不影响，都大同小异，原理都是一样的，非Mac看完此教程后可以结合网上其他教程进行破解测试。</p>
+<p>在破解wifi密码之前，我们要有一个有效的密码字典包，里面要包含大家最常用的密码，还要根据大家的习惯设置相应的密码。我们怎么看大家最常用的密码呢？我在某个软件里看到了常见的wifi密码，上面提示，40%的人用了这些密码，所以你得密码字典中只要包含了这些密码，你就可以破解40%的wifi密码了！<strong>大家不要关心代码，只要知道我在生成密码字典就可以了（想要获取教程中使用的密码字典请关注微信公众帐号：极客峰，回复『密码字典』获取）</strong>：</p>
+<p><img src="/images/2016/12/680166ff4c5f1e082a732970ca8bab8c.png" alt=""></p>
+<p><img src="/images/2016/12/434439c353785570ea9fa49fac4311ac.png" alt=""></p>
+<p>但是网上找不到包含这些密码的密码字典怎么办？极客君决定自己用JAVA写代码生成密码字典，极客君创建了一个数组，里面不仅包含上面，还包括极客君从网上找来的其他常用密码：</p>
+<p><img src="/images/2016/12/150cc50f90051e3ed3b949b1d0e9d29b.png" alt=""></p>
+<p>但是仅仅包含这些密码还不行，因为还有不少人不是用这些密码，但是很多人也会用数字、字母、特殊符号组合，但是这些也是有规律的，数字组合除了上面常用的组合方式外，也会有其他组合方式。但很多人不会随便用自己都记不住的数字组合，一般都是用出生的年月日或者用年月日与其他方式组合。所以极客君又创建下面这些数组：</p>
+<p><img src="/images/2016/12/c09b817c7b8463dfe788e95bfa526e03.png" alt=""></p>
+<p>还有的人会拿自己或者家人的名字首字母、名字全拼或姓氏全拼与上面常用数字组合、出生年月日、特殊字符任意组合。所以极客君为了缩小密码字典体积，只录入了北京地区常用姓氏和其他个人认为常见的姓氏，如下：</p>
+<p><img src="/images/2016/12/ac2ad55cef2c73eaf63a5c030b7f8673.png" alt=""></p>
+<p>对于名字全拼，为了保证覆盖面和有效性，极客君无奈只能把每个字母列出来，然后在所有韵母与这些字母组合，只保留可以组成密码的拼音，这可着实花了极客君一段时间，下面这些拼音是否包含你的名字拼音呢：</p>
+<p><img src="/images/2016/12/f7aa57cff9ca7d9f00cf91d810318571.png" alt=""></p>
+<p><img src="/images/2016/12/16e9669ea6305f1cd92e12b1554fd93e.png" alt=""></p>
+<p><img src="/images/2016/12/1641a6b3c5bbe8dc529999a882393a89.png" alt=""></p>
+<p>特殊字符用的也不多，这里只收录了可能用到的特殊字符。</p>
+<p><img src="/images/2016/12/c39ea7f7c4900fbc7f866a1084d791da.png" alt=""></p>
+<p>对于生成代码，由于代码较多，这里就不截图了，<strong>如果想要源码，请关注微信公众帐号[极客峰]留言索取。</strong></p>
+<p>好了，接下来就是生成密码字典了，由于和名字全拼相关的密码字典较大，而且不是非常常用，极客君把它单独生成：</p>
+<p><img src="/images/2016/12/d22a6bec31247bccadf69284344eef5a.png" alt=""></p>
+<p>这两个密码生成之后比较大，但是对于电脑来说没什么，分别为100G和358M，所以后面我们不首先用这些密码包。</p>
+<p><img src="/images/2016/12/9801ccdafb005ce6ba91c4e53984a671.png" alt=""></p>
+<p>下面我们生成常用的、强大的密码字典，具体包含组合方式见下面截图：</p>
+<p><img src="/images/2016/12/3ea35c27df34913f045da90f62d81249.png" alt=""></p>
+<p>首先输入字典名称，按回车，输入3生成我们的超级密码，对于为什么这样输入大家不用关系，只知道我们在生成字典就行了，我将文件名命名为”jikefeng.txt”，然后按回车输入3开始生成：</p>
+<p><img src="/images/2016/12/a16995f375cf0e3872740a01cb829fd9.png" alt=""></p>
+<p><img src="/images/2016/12/6f790c48c6b20aaf90e9d1e1c3818c14.png" alt=""></p>
+<p>好了，我们去看看生成的字典密码，一共1.15G，大小还可以，比网上几十G的密码包好太多了：</p>
+<p><img src="/images/2016/12/5eb26cb5e8e06f3b153ebf5f4e140652.png" alt=""></p>
+<p>好了字典包生成好了，接下来还是步入整体，开始破解了。首先看一下附近的wifi：</p>
+<p><img src="/images/2016/12/e77ad0de5883c875fd872367cf0893f4.png" alt=""></p>
+<p>我们选择破解信号最强的wifi，极客君住在一楼，上面wifi中最后一个ziroom101从名称上看也是在1楼，所以极客君就破解这个了。</p>
+<p>首先要确保电脑安装 Xcode 和 MacPorts，Xcode 可以直接在 App Store下载，MacPorts 需要进入它的官网下载。MacPorts 是一个软件包管理系统，用来简化 Mac OS 系统上软件的安装，与Fink和BSD类ports套件的目标和功能类似。就像apt-get、yum一样，可以快速安装些软件。把这两个软件安装成功后就可以开始安装 Aircrack。打开终端输入命令：</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo<span class="built_in"> port </span>install aircrack-ng</span><br></pre></td></tr></table></figure>
+<p>要求输入密码，输入后可能会提示 Port aircrack-ng not found ，没关系我们需要更新ports tree，在终端执行：</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo<span class="built_in"> port </span>-v selfupdate</span><br></pre></td></tr></table></figure>
+<p>现在可以开始安装 Aircrack 了，如果还提示 not found，那么再次执行更新ports tree 命令。安装 Aircrack 会比较慢，等安装好后 ，我们需要将 Aircrack 命令建立一个链接，类似Windows下的超级链接，在终端输入：</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo ln -s <span class="regexp">/System/</span>Library<span class="regexp">/PrivateFrameworks/</span>Apple80211.framework<span class="regexp">/Versions/</span>Current<span class="regexp">/Resources/</span>airport <span class="regexp">/usr/</span>local<span class="regexp">/bin/</span>airport</span><br></pre></td></tr></table></figure>
+<p>然后在终端内输入：</p>
+<figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">airport -s</span></span><br></pre></td></tr></table></figure>
+<p>就能查看到附近的 Wifi 信息了，如下图：</p>
+<p><img src="/images/2016/12/28bdedd793d70ca907b4ef55f72e8a1a.png" alt=""></p>
+<p>SSID 是 wifi 名称，RSSI 是信号强度，绝对值越小信号越强，CHANNEL 是信道。挑一个信号强的信道进行监听抓包（比如我们要破解的ziroom101在信道13 ），在终端输入：</p>
+<figure class="highlight elm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">sudo</span> air<span class="keyword">port</span> en0 sniff 13</span><br></pre></td></tr></table></figure>
+<p>中间会提示输入管理员密码，输入密码后回车就开始抓包了，如下图：</p>
+<p><img src="/images/2016/12/d7c84c166d0034851550677f0fc53e76.png" alt=""></p>
+<p>过几分钟后就可以按「 control ＋ c 」退出抓包，会自动保存并提示抓得包保存路径：</p>
+<p><img src="/images/2016/12/1b77fa34383c3fb2b1a355fa1df855f8.png" alt=""></p>
+<p>接着进入 tmp 文件就可以查看我们抓到的数据包了，进入 tmp 文件夹我们可以使用 Finder 的前往文件夹功能 ，如图：</p>
+<p><img src="/images/2016/12/cfabca1c3d8c46e442f2f50a9c34d246.png" alt=""></p>
+<p><img src="/images/2016/12/49e486c8eb368bf64f9753e7e055b439.png" alt=""></p>
+<p>我们在桌面上建立文件夹，命名为”jikefeng”，将我们之前生成的密码字典和抓的包都放进去，并且把抓的包也重命名为”jikefeng”，如下：</p>
+<p><img src="/images/2016/12/865bfbc47e9db01b229c0f2c7d93742d.png" alt=""></p>
+<p>接着我们输入下面命令行进入我们在桌面上创建的”jikefeng”文件夹：</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cd Desktop<span class="regexp">/jikefeng/</span></span><br></pre></td></tr></table></figure>
+<p>进入”jikefeng”文件夹后输入：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">aircrack-ng</span> <span class="selector-tag">-w</span> <span class="selector-tag">jikefeng</span><span class="selector-class">.txt</span> <span class="selector-tag">jikefeng</span><span class="selector-class">.cap</span></span><br></pre></td></tr></table></figure>
+<p>就可以看到cap文件内的抓包情况，Encryption 中（0 handshake）是抓包失败，（1 handshake）则是抓包成功。点击终端，按下「command ＋ f」进行搜索1 handshake，图中看到第3行抓包成功，则在「Index number of target network ?」这里输入3后敲回车：</p>
+<p><img src="/images/2016/12/6d945617e96ac976bee9ec5b7dab36ad.png" alt=""></p>
+<p><img src="/images/2016/12/786bd7c2cd2ca8d5b4ccb3f81e177aa9.png" alt=""></p>
+<p>之后剩下的就是等待了，当破解密码成功（发现了密码）后会出现下图提示：</p>
+<p><img src="/images/2016/12/1ec87cf3e1109972d1b53eee80dea686.png" alt=""></p>
+<p>所以我们破解出了ziroom101的密码为12344321，令人兴奋的是该密码正是常用密码之一，所以几乎秒破，一点都没有挑战难度。</p>
+<p>利用相同的方法，我破解出了附近wifi中的其他密码（其中破解wifi名为zhouyubo密码花的时间稍微长点，但我也没管它，剩下的就交给电脑了）：</p>
+<p>zhouyubo的密码为zhouyonghu19911129</p>
+<p>Netcore_5G的密码为xy11112222！</p>
+<p>综合以上，怎么样才能保证密码的安全呢？没有百分百的安全，因为密码字典可以包含所有密码，只能把密码设的尽量复杂，但是输的太复杂自己又记不住、输入起来也麻烦。所以，怎么平衡就看自己喽~</p>
+<p>还有，在生成密码字典时候，如果你知道密码主人的一些信息，你可以根据这些信息生成更准确的密码，比如知道姓名、手机号、QQ号、出生日期等，这些都可能是密码的一部分。因为很少有人会用无意义不好记的数字做密码，就算有，准备好相应的密码字典就可以了。网上也有密码字典生成工具，也可以直接下载相应的密码字典包，但是我下载了不少发现几乎就没几个靠谱的，所以需要多找找。记住，破解密码的时候先使用弱口令密码字典，所谓弱口令密码就是最常用的密码，比较大部分人都会用这些密码，当然，极客君上面用的密码字典中已经包含了几乎所有的弱口令密码，并且把弱口令密码放到密码最前面，让这些密码最先被使用，这样破解起来也省事，省的来回换字典了。</p>
+<p>相关密码字典下载：<br>[ypbtn]<a href="https://pan.baidu.com/s/1jIdmIHK[/ypbtn]" target="_blank" rel="noopener">https://pan.baidu.com/s/1jIdmIHK[/ypbtn]</a></p>
+<p>想要获取相关教程及开发交流请关注微信公众帐号：极客峰，回复『密码字典』获取教程中用到的所有密码字典。</p>
+<p><img src="/images/2016/12/213978d09e44efdaf5cb697317bad844.jpg" alt=""></p>
+</div><div><ul class="post-copyright"><li class="post-copyright-author"><strong>本文作者：</strong>imlifengfeng</li><li class="post-copyright-link"><strong>本文链接：</strong><a href="/2016/12/04/15/">http://www.imlifengfeng.com/2016/12/04/15/</a></li><li class="post-copyright-license"><strong>版权声明：</strong>原创文章，转载请注明来源</li></ul></div><br><div class="tags"><a href="/tags/pin码/">pin码</a><a href="/tags/wifi密码/">wifi密码</a><a href="/tags/破解/">破解</a><a href="/tags/破解WIFI/">破解WIFI</a></div><div class="post-nav"><a class="pre" href="/2016/12/04/16/">iOS开发之Autolayout</a></div><div id="container"></div><link rel="stylesheet" type="text/css" href="//unpkg.com/gitalk/dist/gitalk.css?v=0.0.0"><script type="text/javascript" src="//cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.js?v=0.0.0"></script><script type="text/javascript" src="//unpkg.com/gitalk/dist/gitalk.min.js?v=0.0.0"></script><script>var gitalk = new Gitalk({
+  clientID: 'c364198c7db8ed6a1011',
+  clientSecret: '7613c9d1c4706bdebff2c7adf84efdf98839ec7d',
+  repo: 'imlifengfeng.github.io',
+  owner: 'imlifengfeng',
+  admin: ['imlifengfeng'],
+  id: md5(location.pathname),
+  distractionFreeMode: false
+})
+gitalk.render('container')
+</script></div></div></div><div class="pure-u-1-4 hidden_mid_and_down"><div id="sidebar"><div class="widget"><form class="search-form" action="//www.google.com/search" method="get" accept-charset="utf-8" target="_blank"><input type="text" name="q" maxlength="20" placeholder="Search"><input type="hidden" name="sitesearch" value="http://www.imlifengfeng.com"></form></div><div class="widget"><div class="widget-title"><i class="fa fa-folder-o"> 分类</i></div><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Android/">Android</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/iOS/">iOS</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/教程/">教程</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/算法/">算法</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-file-o"> 最近文章</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2018/10/03/714/">iOS 的组件化开发</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/07/06/692/">iOS逆向工程之fishhook</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/06/25/677/">iOS逆向工程之插件开发</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/04/03/674/">Swift算法实现之归并排序</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/04/01/672/">Swift算法实现之快速排序</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/03/31/669/">Swift算法实现之翻转二叉树</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/03/31/661/">Swift算法实现之二叉树</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/03/28/658/">Swift算法实现之栈和队列</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/03/27/654/">Swift算法实现之查找第K大的元素</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/03/23/652/">Swift算法实现之数组中出现次数超过一半的数字</a></li></ul></div></div></div><div class="pure-u-1 pure-u-md-3-4"><div id="footer">Copyright © 2018 <a href="/." rel="nofollow">imlifengfeng.</a> Powered by<a rel="nofollow" target="_blank" href="https://hexo.io"> Hexo.</a><a rel="nofollow" target="_blank" href="https://github.com/tufu9441/maupassant-hexo"> Theme</a> by<a rel="nofollow" target="_blank" href="https://github.com/pagecho"> Cho.</a></div></div></div><a class="show" id="rocket" href="#top"></a><script type="text/javascript" src="/js/totop.js?v=0.0.0" async></script><script type="text/javascript" src="//lib.baomitu.com/fancybox/3.5.2/jquery.fancybox.min.js" async></script><script type="text/javascript" src="/js/fancybox.js?v=0.0.0" async></script><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/fancybox/3.5.2/jquery.fancybox.min.css"><script type="text/javascript" src="/js/codeblock-resizer.js?v=0.0.0"></script><script type="text/javascript" src="/js/smartresize.js?v=0.0.0"></script></div></body></html>

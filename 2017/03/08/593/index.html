@@ -1,0 +1,132 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta name="generator" content="Hexo 3.8.0"><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="description"><title>iOS的离屏渲染 | imlifengfeng</title><link rel="stylesheet" type="text/css" href="/css/style.css?v=0.0.0"><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/normalize/8.0.1/normalize.min.css"><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/pure/1.0.0/pure-min.css"><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/pure/1.0.0/grids-responsive-min.css"><link rel="stylesheet" href="//lib.baomitu.com/font-awesome/4.7.0/css/font-awesome.min.css"><script type="text/javascript" src="//lib.baomitu.com/jquery/3.3.1/jquery.min.js"></script><link rel="icon" mask="" sizes="any" href="/favicon.ico"><link rel="Shortcut Icon" type="image/x-icon" href="/favicon.ico"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png"><link href="//netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"><link rel="alternate" type="application/atom+xml" href="/atom.xml"></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden">iOS的离屏渲染</h1><a id="logo" href="/.">imlifengfeng</a><p class="description"></p></div><div id="nav-menu"><a class="current" href="/."><i class="fa fa-home"> 首页</i></a><a href="/archives/"><i class="fa fa-archive"> 归档</i></a><a href="/about/"><i class="fa fa-user"> 关于</i></a><a href="/atom.xml"><i class="fa fa-rss"> 订阅</i></a></div></div><div class="pure-g" id="layout"><div class="pure-u-1 pure-u-md-3-4"><div class="content_container"><div class="post"><h1 class="post-title">iOS的离屏渲染</h1><div class="post-meta">Mar 8, 2017<span> | </span><span class="category"><a href="/categories/iOS/">iOS</a></span></div><div class="post-content"><p>一、<strong>概述</strong></p>
+<p>OpenGL ES是一套多功能开放标准的用于嵌入系统的C-based的图形库，用于2D和3D数据的可视化。OpenGL被设计用来转换一组图形调用功能到底层图形硬件（GPU），由GPU执行图形命令，用来实现复杂的图形操作和运算，从而能够高性能、高帧率利用GPU提供的2D和3D绘制能力。iOS系统默认支持OpenGl ES1.0、ES2.0以及ES3.0 3个版本，三者之间并不是简单的版本升级，设计理念甚至完全不同。GPU屏幕渲染方式中有一种方式为离屏渲染，处理不好离屏渲染往往会对APP的性能产生较大的影响。</p>
+<p>二、<strong>当前屏幕渲染与离屏渲染</strong></p>
+<p>OpenGL中，GPU屏幕渲染有两种方式:</p>
+<p>（1）On-Screen Rendering (当前屏幕渲染) </p>
+<p>指的是GPU的渲染操作是在当前用于显示的屏幕缓冲区进行。</p>
+<p>（2）Off-Screen Rendering (离屏渲染)</p>
+<p>指的是在GPU在当前屏幕缓冲区以外开辟一个缓冲区进行渲染操作。</p>
+<p>当前屏幕渲染不需要额外创建新的缓存，也不需要开启新的上下文，相对于离屏渲染性能更好。但是受当前屏幕渲染的局限因素限制(只有自身上下文、屏幕缓存有限等)，当前屏幕渲染有些情况下的渲染解决不了的，就使用到离屏渲染。</p>
+<p>相比于当前屏幕渲染，离屏渲染的代价是很高的，主要体现在两个方面：</p>
+<p>（1）创建新缓冲区</p>
+<p>要想进行离屏渲染，首先要创建一个新的缓冲区。</p>
+<p>（2）上下文切换</p>
+<p>离屏渲染的整个过程，需要多次切换上下文环境：先是从当前屏幕（On-Screen）切换到离屏（Off-Screen），等到离屏渲染结束以后，将离屏缓冲区的渲染结果显示到屏幕上有需要将上下文环境从离屏切换到当前屏幕。而上下文环境的切换是要付出很大代价的。</p>
+<p>特殊的“离屏渲染”：CPU渲染</p>
+<p>如果我们重写了drawRect方法，并且使用任何Core Graphics的技术进行了绘制操作，就涉及到了CPU渲染。整个渲染过程由CPU在App内同步地完成，渲染得到的bitmap(位图)最后再交由GPU用于显示。</p>
+<p><a href="https://robots.thoughtbot.com/designing-for-ios-graphics-performance" target="_blank" rel="noopener">Designing for iOS: Graphics &amp; Performance</a> 这篇文章也提到了使用 Core Graphics API 会触发离屏渲染。 苹果 iOS 4.1-8 时期的 UIKit 组成员Andy Matuschak也曾对这个说法进行解释：「Core Graphics 的绘制 API 的确会触发离屏渲染，但不是那种 GPU 的离屏渲染。使用 Core Graphics 绘制 API 是在 CPU 上执行，触发的是 CPU 版本的离屏渲染。」</p>
+<p>三、<strong>为什么要有离屏渲染</strong></p>
+<p>大家高中物理应该学过显示器是如何显示图像的：需要显示的图像经过CRT电子枪以极快的速度一行一行的扫描，扫描出来就呈现了一帧画面，随后电子枪又会回到初始位置循环扫描，形成了我们看到的图片或视频。<br>为了让显示器的显示跟视频控制器同步，当电子枪新扫描一行的时候，准备扫描的时发送一个水平同步信号(HSync信号)，显示器的刷新频率就是HSync信号产生的频率。然后CPU计算好frame等属性，将计算好的内容交给GPU去渲染，GPU渲染好之后就会放入帧缓冲区。然后视频控制器会按照HSync信号逐行读取帧缓冲区的数据，经过可能的数模转换传递给显示器，就显示出来了。具体的大家自行查找资料或询问相关专业人士，这里只参考网上资料做一个简单的描述。<br>离屏渲染的代价很高，想要进行离屏渲染，首选要创建一个新的缓冲区，屏幕渲染会有一个上下文环境的一个概念，离屏渲染的整个过程需要切换上下文环境，先从当前屏幕切换到离屏，等结束后，又要将上下文环境切换回来。这也是为什么会消耗性能的原因了。<br>由于垂直同步的机制，如果在一个 HSync 时间内，CPU 或者 GPU 没有完成内容提交，则那一帧就会被丢弃，等待下一次机会再显示，而这时显示屏会保留之前的内容不变。这就是界面卡顿的原因。</p>
+<p>既然离屏渲染这么耗性能,为什么有这套机制呢?</p>
+<p>有些效果被认为不能直接呈现于屏幕，而需要在别的地方做额外的处理预合成。图层属性的混合体没有预合成之前不能直接在屏幕中绘制，所以就需要屏幕外渲染。屏幕外渲染并不意味着软件绘制，但是它意味着图层必须在被显示之前在一个屏幕外上下文中被渲染（不论CPU还是GPU）。</p>
+<p>下面的情况或操作会引发离屏渲染：</p>
+<ul>
+<li>为图层设置遮罩（layer.mask）</li>
+</ul>
+<ul>
+<li>将图层的layer.masksToBounds / view.clipsToBounds属性设置为true</li>
+</ul>
+<ul>
+<li>将图层layer.allowsGroupOpacity属性设置为YES和layer.opacity小于1.0</li>
+</ul>
+<ul>
+<li>为图层设置阴影（layer.shadow *）。</li>
+</ul>
+<ul>
+<li>为图层设置layer.shouldRasterize=true</li>
+</ul>
+<ul>
+<li>具有layer.cornerRadius，layer.edgeAntialiasingMask，layer.allowsEdgeAntialiasing的图层</li>
+</ul>
+<ul>
+<li>文本（任何种类，包括UILabel，CATextLayer，Core Text等）。</li>
+</ul>
+<ul>
+<li>使用CGContext在drawRect :方法中绘制大部分情况下会导致离屏渲染，甚至仅仅是一个空的实现。</li>
+</ul>
+<p>四、<strong>优化方案</strong></p>
+<p>官方对离屏渲染产生性能问题也进行了优化：</p>
+<p>iOS 9.0 之前UIimageView跟UIButton设置圆角都会触发离屏渲染。</p>
+<p>iOS 9.0 之后UIButton设置圆角会触发离屏渲染，而UIImageView里png图片设置圆角不会触发离屏渲染了，如果设置其他阴影效果之类的还是会触发离屏渲染的。</p>
+<p>1、圆角优化</p>
+<p>在APP开发中，圆角图片还是经常出现的。如果一个界面中只有少量圆角图片或许对性能没有非常大的影响，但是当圆角图片比较多的时候就会APP性能产生明显的影响。</p>
+<p>我们设置圆角一般通过如下方式：</p>
+<figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">imageView.layer.cornerRadius = CGFloat(<span class="number">10</span>)<span class="comment">;</span></span><br><span class="line">imageView.layer.masksToBounds = YES<span class="comment">;</span></span><br></pre></td></tr></table></figure>
+<p>这样处理的渲染机制是GPU在当前屏幕缓冲区外新开辟一个渲染缓冲区进行工作，也就是离屏渲染，这会给我们带来额外的性能损耗，如果这样的圆角操作达到一定数量，会触发缓冲区的频繁合并和上下文的的频繁切换，性能的代价会宏观地表现在用户体验上——掉帧。</p>
+<p>优化方案1：使用贝塞尔曲线UIBezierPath和Core Graphics框架画出一个圆角</p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">UIImageView</span> *imageView = [[<span class="built_in">UIImageView</span> alloc]initWithFrame:<span class="built_in">CGRectMake</span>(<span class="number">100</span>, <span class="number">100</span>, <span class="number">100</span>, <span class="number">100</span>)]; </span><br><span class="line">imageView.image = [<span class="built_in">UIImage</span> imageNamed:<span class="string">@"myImg"</span>]; </span><br><span class="line"><span class="comment">//开始对imageView进行画图 </span></span><br><span class="line"><span class="built_in">UIGraphicsBeginImageContextWithOptions</span>(imageView.bounds.size, <span class="literal">NO</span>, <span class="number">1.0</span>); </span><br><span class="line"><span class="comment">//使用贝塞尔曲线画出一个圆形图 </span></span><br><span class="line">[[<span class="built_in">UIBezierPath</span> bezierPathWithRoundedRect:imageView.bounds cornerRadius:imageView.frame.size.width] addClip];</span><br><span class="line">[imageView drawRect:imageView.bounds];</span><br><span class="line">imageView.image = <span class="built_in">UIGraphicsGetImageFromCurrentImageContext</span>(); </span><br><span class="line"><span class="comment">//结束画图 </span></span><br><span class="line"><span class="built_in">UIGraphicsEndImageContext</span>();</span><br><span class="line">[<span class="keyword">self</span>.view addSubview:imageView];</span><br></pre></td></tr></table></figure>
+<p>优化方案2：使用CAShapeLayer和UIBezierPath设置圆角</p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">UIImageView</span> *imageView = [[<span class="built_in">UIImageView</span> alloc]initWithFrame:<span class="built_in">CGRectMake</span>(<span class="number">100</span>, <span class="number">100</span>, <span class="number">100</span>, <span class="number">100</span>)]; </span><br><span class="line">imageView.image = [<span class="built_in">UIImage</span> imageNamed:<span class="string">@"myImg"</span>]; </span><br><span class="line"><span class="built_in">UIBezierPath</span> *maskPath = [<span class="built_in">UIBezierPath</span> bezierPathWithRoundedRect:imageView.bounds byRoundingCorners:<span class="built_in">UIRectCornerAllCorners</span> cornerRadii:imageView.bounds.size];</span><br><span class="line"><span class="built_in">CAShapeLayer</span> *maskLayer = [[<span class="built_in">CAShapeLayer</span> alloc]init]; </span><br><span class="line"><span class="comment">//设置大小 </span></span><br><span class="line">maskLayer.frame = imageView.bounds; </span><br><span class="line"><span class="comment">//设置图形样子 </span></span><br><span class="line">maskLayer.path = maskPath.CGPath;</span><br><span class="line">imageView.layer.mask = maskLayer; </span><br><span class="line">[<span class="keyword">self</span>.view addSubview:imageView];</span><br></pre></td></tr></table></figure>
+<p>对于方案2需要解释的是：</p>
+<ul>
+<li>CAShapeLayer继承于CALayer,可以使用CALayer的所有属性值；</li>
+</ul>
+<ul>
+<li>CAShapeLayer需要贝塞尔曲线配合使用才有意义（也就是说才有效果）</li>
+</ul>
+<ul>
+<li>使用CAShapeLayer(属于CoreAnimation)与贝塞尔曲线可以实现不在view的drawRect（继承于CoreGraphics走的是CPU,消耗的性能较大）方法中画出一些想要的图形</li>
+</ul>
+<ul>
+<li>CAShapeLayer动画渲染直接提交到手机的GPU当中，相较于view的drawRect方法使用CPU渲染而言，其效率极高，能大大优化内存使用情况。</li>
+</ul>
+<p>总的来说就是用CAShapeLayer的内存消耗少，渲染速度快，建议使用优化方案2。</p>
+<p>2、shadow优化</p>
+<p>对于shadow，如果图层是个简单的几何图形或者圆角图形，我们可以通过设置shadowPath来优化性能，能大幅提高性能。示例如下：</p>
+<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">imageView.layer.<span class="keyword">shadowColor </span>= [UIColor grayColor].CGColor<span class="comment">;</span></span><br><span class="line">imageView.layer.<span class="keyword">shadowOpacity </span>= <span class="number">1</span>.<span class="number">0</span><span class="comment">;</span></span><br><span class="line">imageView.layer.<span class="keyword">shadowRadius </span>= <span class="number">2</span>.<span class="number">0</span><span class="comment">;</span></span><br><span class="line">UIBezierPath *path = [UIBezierPath <span class="keyword">bezierPathWithRect:imageView.frame];</span></span><br><span class="line"><span class="keyword">imageView.layer.shadowPath </span>= path.CGPath<span class="comment">;</span></span><br></pre></td></tr></table></figure>
+<p>我们还可以通过设置shouldRasterize属性值为YES来强制开启离屏渲染。其实就是光栅化（Rasterization）。既然离屏渲染这么不好，为什么我们还要强制开启呢？当一个图像混合了多个图层，每次移动时，每一帧都要重新合成这些图层，十分消耗性能。当我们开启光栅化后，会在首次产生一个位图缓存，当再次使用时候就会复用这个缓存。但是如果图层发生改变的时候就会重新产生位图缓存。所以这个功能一般不能用于UITableViewCell中，cell的复用反而降低了性能。最好用于图层较多的静态内容的图形。而且产生的位图缓存的大小是有限制的，一般是2.5个屏幕尺寸。在100ms之内不使用这个缓存，缓存也会被删除。所以我们要根据使用场景而定。</p>
+<p>3、其他的一些优化建议</p>
+<ul>
+<li>当我们需要圆角效果时，可以使用一张中间透明图片蒙上去</li>
+</ul>
+<ul>
+<li>使用ShadowPath指定layer阴影效果路径</li>
+</ul>
+<ul>
+<li>使用异步进行layer渲染（Facebook开源的异步绘制框架AsyncDisplayKit）</li>
+</ul>
+<ul>
+<li>设置layer的opaque值为YES，减少复杂图层合成</li>
+</ul>
+<ul>
+<li>尽量使用不包含透明（alpha）通道的图片资源</li>
+</ul>
+<ul>
+<li>尽量设置layer的大小值为整形值</li>
+</ul>
+<ul>
+<li>直接让美工把图片切成圆角进行显示，这是效率最高的一种方案</li>
+</ul>
+<ul>
+<li>很多情况下用户上传图片进行显示，可以让服务端处理圆角</li>
+</ul>
+<ul>
+<li>使用代码手动生成圆角Image设置到要显示的View上，利用UIBezierPath（CoreGraphics框架）画出来圆角图片</li>
+</ul>
+<p>五、<strong>Core Animation工具检测离屏渲染</strong></p>
+<p>对于离屏渲染的检测，苹果为我们提供了一个测试工具Core Animation。可以在Xcode-&gt;Open Develeper Tools-&gt;Instruments中找到，如下图：</p>
+<p><img src="/images/2017/03/201703080040.png" alt="201703080040"></p>
+<p>Core Animation工具用来监测Core Animation性能，提供可见的FPS值，并且提供几个选项来测量渲染性能。如下图：</p>
+<p><img src="/images/2017/03/201703080041.png" alt="201703080041"></p>
+<p>下面我们来说明每个选项的功能：<br>Color Blended Layers：这个选项如果勾选，你能看到哪个layer是透明的，GPU正在做混合计算。显示红色的就是透明的，绿色就是不透明的。</p>
+<p>Color Hits Green and Misses Red：如果勾选这个选项，且当我们代码中有设置shouldRasterize为YES，那么红色代表没有复用离屏渲染的缓存，绿色则表示复用了缓存。我们当然希望能够复用。</p>
+<p>Color Copied Images：按照官方的说法，当图片的颜色格式GPU不支持的时候，Core Animation会<br>拷贝一份数据让CPU进行转化。例如从网络上下载了TIFF格式的图片，则需要CPU进行转化，这个区域会显示成蓝色。还有一种情况会触发Core Animation的copy方法，就是字节不对齐的时候。如下图：</p>
+<p><img src="/images/2017/03/201703080043.png" alt="201703080043"></p>
+<p>Color Immediately：默认情况下Core Animation工具以每毫秒10次的频率更新图层调试颜色，如果勾选这个选项则移除10ms的延迟。对某些情况需要这样，但是有可能影响正常帧数的测试。</p>
+<p>Color Misaligned Images：勾选此项，如果图片需要缩放则标记为黄色，如果没有像素对齐则标记为紫色。像素对齐我们已经在上面有所介绍。</p>
+<p>Color Offscreen-Rendered Yellow：用来检测离屏渲染的，如果显示黄色，表示有离屏渲染。当然还要结合Color Hits Green and Misses Red来看，是否复用了缓存。</p>
+<p>Color OpenGL Fast Path Blue：这个选项对那些使用OpenGL的图层才有用，像是GLKView或者 CAEAGLLayer，如果不显示蓝色则表示使用了CPU渲染，绘制在了屏幕外，显示蓝色表示正常。</p>
+<p>Flash Updated Regions：当对图层重绘的时候回显示黄色，如果频繁发生则会影响性能。可以用增加缓存来增强性能。</p>
+<p>具体的使用截图就不发出来了，大家自己可以试试。</p>
+<p>参考：<a href="https://developer.apple.com/library/content/documentation/3DDrawing/Conceptual/OpenGLES_ProgrammingGuide/WorkingwithEAGLContexts/WorkingwithEAGLContexts.html" target="_blank" rel="noopener">Drawing to Other Rendering Destinations</a></p>
+</div><div><ul class="post-copyright"><li class="post-copyright-author"><strong>本文作者：</strong>imlifengfeng</li><li class="post-copyright-link"><strong>本文链接：</strong><a href="/2017/03/08/593/">http://www.imlifengfeng.com/2017/03/08/593/</a></li><li class="post-copyright-license"><strong>版权声明：</strong>原创文章，转载请注明来源</li></ul></div><br><div class="tags"><a href="/tags/iOS/">iOS</a><a href="/tags/离屏渲染/">离屏渲染</a></div><div class="post-nav"><a class="pre" href="/2017/03/09/598/">iOS 触摸事件</a><a class="next" href="/2017/03/06/588/">iOS XCTest单元测试</a></div><div id="container"></div><link rel="stylesheet" type="text/css" href="//unpkg.com/gitalk/dist/gitalk.css?v=0.0.0"><script type="text/javascript" src="//cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.js?v=0.0.0"></script><script type="text/javascript" src="//unpkg.com/gitalk/dist/gitalk.min.js?v=0.0.0"></script><script>var gitalk = new Gitalk({
+  clientID: 'c364198c7db8ed6a1011',
+  clientSecret: '7613c9d1c4706bdebff2c7adf84efdf98839ec7d',
+  repo: 'imlifengfeng.github.io',
+  owner: 'imlifengfeng',
+  admin: ['imlifengfeng'],
+  id: md5(location.pathname),
+  distractionFreeMode: false
+})
+gitalk.render('container')
+</script></div></div></div><div class="pure-u-1-4 hidden_mid_and_down"><div id="sidebar"><div class="widget"><form class="search-form" action="//www.google.com/search" method="get" accept-charset="utf-8" target="_blank"><input type="text" name="q" maxlength="20" placeholder="Search"><input type="hidden" name="sitesearch" value="http://www.imlifengfeng.com"></form></div><div class="widget"><div class="widget-title"><i class="fa fa-folder-o"> 分类</i></div><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Android/">Android</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/iOS/">iOS</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/教程/">教程</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/算法/">算法</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-file-o"> 最近文章</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2018/10/03/714/">iOS 的组件化开发</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/07/06/692/">iOS逆向工程之fishhook</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/06/25/677/">iOS逆向工程之插件开发</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/04/03/674/">Swift算法实现之归并排序</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/04/01/672/">Swift算法实现之快速排序</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/03/31/669/">Swift算法实现之翻转二叉树</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/03/31/661/">Swift算法实现之二叉树</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/03/28/658/">Swift算法实现之栈和队列</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/03/27/654/">Swift算法实现之查找第K大的元素</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/03/23/652/">Swift算法实现之数组中出现次数超过一半的数字</a></li></ul></div></div></div><div class="pure-u-1 pure-u-md-3-4"><div id="footer">Copyright © 2018 <a href="/." rel="nofollow">imlifengfeng.</a> Powered by<a rel="nofollow" target="_blank" href="https://hexo.io"> Hexo.</a><a rel="nofollow" target="_blank" href="https://github.com/tufu9441/maupassant-hexo"> Theme</a> by<a rel="nofollow" target="_blank" href="https://github.com/pagecho"> Cho.</a></div></div></div><a class="show" id="rocket" href="#top"></a><script type="text/javascript" src="/js/totop.js?v=0.0.0" async></script><script type="text/javascript" src="//lib.baomitu.com/fancybox/3.5.2/jquery.fancybox.min.js" async></script><script type="text/javascript" src="/js/fancybox.js?v=0.0.0" async></script><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/fancybox/3.5.2/jquery.fancybox.min.css"><script type="text/javascript" src="/js/codeblock-resizer.js?v=0.0.0"></script><script type="text/javascript" src="/js/smartresize.js?v=0.0.0"></script></div></body></html>
